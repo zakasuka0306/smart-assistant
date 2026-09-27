@@ -22,13 +22,11 @@ Python, python-telegram-bot, requests, edge-tts, deep-translator.
 
 ```text
 main.py
-requirements.txt
 README.md
 ```
 
 ## Запуск
 
 ```bash
-pip install -r requirements.txt
 python main.py
 ```
