@@ -66,9 +66,9 @@ def clear_history(user_id):
 
 
 keyboard = [
-    ["🌤 Погода", "🧠 Факт"],
-    ["🌐 Перевод", "🔊 Озвучка"],
-    ["📜 История", "🗑 Очистить историю"],
+    ["Погода", "Факт"],
+    ["Перевод", "Озвучка"],
+    ["История", "Очистить историю"],
 ]
 
 reply_keyboard = ReplyKeyboardMarkup(
@@ -80,15 +80,15 @@ reply_keyboard = ReplyKeyboardMarkup(
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(
-        "👋 Привет!\n\n"
+        "Привет!\n\n"
         "Я многофункциональный бот.\n\n"
         "Что я умею:\n"
-        "🌤 Узнавать погоду\n"
-        "🧠 Показывать интересные факты\n"
-        "🌐 Переводить текст\n"
-        "🔊 Озвучивать текст\n"
-        "📜 Хранить историю запросов\n\n"
-        "Выбери нужную функцию ниже 👇",
+        "Узнавать погоду\n"
+        "Показывать интересные факты\n"
+        "Переводить текст\n"
+        "Озвучивать текст\n"
+        "Хранить историю запросов\n\n"
+        "Выбери нужную функцию ниже",
         reply_markup=reply_keyboard
     )
 
@@ -98,7 +98,7 @@ async def weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["mode"] = "weather"
 
     await update.message.reply_text(
-        "🌤 Напиши название города.\n\n"
+        "Напиши название города.\n\n"
         "Например:\n"
         "Алматы\n"
         "Москва"
@@ -126,12 +126,12 @@ async def get_weather(update: Update, city):
         description = current["weatherDesc"][0]["value"]
 
         result = (
-            f"🌤 Погода в городе {city}\n\n"
-            f"🌡 Температура: {temperature}°C\n"
-            f"🥶 Ощущается как: {feels}°C\n"
-            f"☁️ Состояние: {description}\n"
-            f"💧 Влажность: {humidity}%\n"
-            f"💨 Ветер: {wind} км/ч"
+            f"Погода в городе {city}\n\n"
+            f"Температура: {temperature}°C\n"
+            f"Ощущается как: {feels}°C\n"
+            f"Состояние: {description}\n"
+            f"Влажность: {humidity}%\n"
+            f"Ветер: {wind} км/ч"
         )
 
         save_history(
@@ -144,7 +144,7 @@ async def get_weather(update: Update, city):
 
     except Exception:
         await update.message.reply_text(
-            "❌ Не удалось получить погоду.\n"
+            "Не удалось получить погоду.\n"
             "Проверь название города."
         )
 
@@ -167,7 +167,7 @@ async def fact(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     import random
 
-    result = "🧠 Интересный факт:\n\n" + random.choice(facts)
+    result = "Интересный факт:\n\n" + random.choice(facts)
 
     save_history(
         update.effective_user.id,
@@ -184,7 +184,7 @@ async def translate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["mode"] = "translate"
 
     await update.message.reply_text(
-        "🌐 Напиши текст, который нужно перевести.\n\n"
+        "Напиши текст, который нужно перевести.\n\n"
         "Например:\n"
         "Hello, how are you?"
     )
@@ -193,7 +193,6 @@ async def translate(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def do_translate(update: Update, text):
 
     try:
-        # Определяем язык
         if any("а" <= char.lower() <= "я" for char in text):
             source = "ru"
             target = "en"
@@ -201,14 +200,11 @@ async def do_translate(update: Update, text):
             source = "en"
             target = "ru"
 
-        url = "https://translate.googleapis.com/translate_a/single"
+        url = "https://api.mymemory.translated.net/get"
 
         params = {
-            "client": "gtx",
-            "sl": source,
-            "tl": target,
-            "dt": "t",
-            "q": text
+            "q": text,
+            "langpair": f"{source}|{target}"
         }
 
         response = requests.get(
@@ -217,19 +213,17 @@ async def do_translate(update: Update, text):
             timeout=10
         )
 
+        response.raise_for_status()
+
         data = response.json()
 
-        translated = ""
-
-        for item in data[0]:
-            if item[0]:
-                translated += item[0]
+        translated = data["responseData"]["translatedText"]
 
         if not translated:
             raise Exception("Пустой перевод")
 
         result = (
-            "🌐 Перевод:\n\n"
+            "Перевод:\n\n"
             + translated
         )
 
@@ -246,7 +240,7 @@ async def do_translate(update: Update, text):
         print("Ошибка перевода:", e)
 
         await update.message.reply_text(
-            "❌ Не удалось перевести текст."
+            "Не удалось перевести текст."
         )
 
 
@@ -255,7 +249,7 @@ async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["mode"] = "voice"
 
     await update.message.reply_text(
-        "🔊 Напиши текст, который нужно озвучить."
+        "Напиши текст, который нужно озвучить."
     )
 
 
@@ -291,7 +285,7 @@ async def make_voice(update: Update, text):
         print("Ошибка озвучки:", e)
 
         await update.message.reply_text(
-            "❌ Не удалось создать голосовое сообщение."
+            "Не удалось создать голосовое сообщение."
         )
 
 
@@ -305,12 +299,12 @@ async def history(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not records:
 
         await update.message.reply_text(
-            "📜 История пока пустая."
+            "История пока пустая."
         )
 
         return
 
-    text = "📜 Последние запросы:\n\n"
+    text = "Последние запросы:\n\n"
 
     for i, (request, result) in enumerate(records, 1):
 
@@ -343,27 +337,27 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     mode = context.user_data.get("mode")
 
-    if text == "🌤 Погода":
+    if text == "Погода":
         await weather(update, context)
         return
 
-    if text == "🧠 Факт":
+    if text == "Факт":
         await fact(update, context)
         return
 
-    if text == "🌐 Перевод":
+    if text == "Перевод":
         await translate(update, context)
         return
 
-    if text == "🔊 Озвучка":
+    if text == "Озвучка":
         await voice(update, context)
         return
 
-    if text == "📜 История":
+    if text == "История":
         await history(update, context)
         return
 
-    if text == "🗑 Очистить историю":
+    if text == "Очистить историю":
         await clear_history_command(update, context)
         return
 
@@ -389,7 +383,7 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     await update.message.reply_text(
-        "Выбери действие с помощью кнопок ниже 👇",
+        "Выбери действие с помощью кнопок ниже",
         reply_markup=reply_keyboard
     )
 
