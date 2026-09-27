@@ -100,7 +100,6 @@ async def weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "🌤 Напиши название города.\n\n"
         "Например:\n"
-        "Караганда\n"
         "Алматы\n"
         "Москва"
     )
