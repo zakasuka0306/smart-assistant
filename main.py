@@ -326,7 +326,7 @@ async def clear_history_command(
     clear_history(update.effective_user.id)
 
     await update.message.reply_text(
-        "🗑 История запросов очищена."
+        "История запросов очищена."
     )
 
 
